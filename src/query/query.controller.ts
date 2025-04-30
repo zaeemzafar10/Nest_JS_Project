@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Post , UsePipes, ValidationPipe } from '@nestjs/common';
+import { 
+    Body, Controller, Get, Post , Put , UsePipes, 
+    ValidationPipe , Param, Delete} from '@nestjs/common';
 import { QueryService } from './query.service';
 import { Query } from './query.schema';
 import { QueryDto } from './query.dto';
@@ -10,6 +12,35 @@ export class QueryController {
     async getAllQueries() {
         return this.queryService.getAllQueries();
     }
+
+    @Get(':id')
+    async getQueryById(
+        @Param('id') id: string
+    ) : Promise<Query | null> {
+        return this.queryService.getQueryById(id);
+    }
+
+    @Delete(':id')
+    async deleteQuery(
+        @Param('id') id: string
+    ) : Promise<{message : string ; data :Query | null}> {
+        return this.queryService.deleteQuery(id);
+    }
+
+
+    @Put(':id')
+    @UsePipes(new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }))
+    async updateQuery(
+        @Param('id') id: string,
+        @Body() query : QueryDto
+    ) : Promise<{message : string , data : Query | null}> {
+        return this.queryService.updateQuery(id ,query);
+    }
+ 
 
     @Post()
     @UsePipes(new ValidationPipe({
@@ -23,4 +54,5 @@ export class QueryController {
         return this.queryService.createQuery(query);
     }
     
+
 }
