@@ -26,6 +26,22 @@ export class AuthService {
       name,
       email,
       password: await Becrpt.hash(password, 10),
+      role: 'user',
+    };
+    return this.userModel.create(data);
+  }
+
+  async createAdmin(user: SignupDto): Promise<User> {
+    const { name, email, password } = user;
+    const existingUser = await this.userModel.findOne({ email });
+    if (existingUser) {
+      throw new BadRequestException('User already exists');
+    }
+    const data = {
+      name,
+      email,
+      password: await Becrpt.hash(password, 10),
+      role: 'admin',
     };
     return this.userModel.create(data);
   }
@@ -49,6 +65,7 @@ export class AuthService {
     const token = this.jwtService.sign({
       id: existingUser?._id,
       email: existingUser?.email,
+      role: existingUser?.role,
     });
     // let userToken = GetToken(existingUser as User);
 
@@ -56,5 +73,11 @@ export class AuthService {
       message: 'Login successful',
       data: { user: existingUser as User, token: token },
     };
+  }
+
+  async getProfile(userId: string): Promise<User | null> {
+    console.log('UserId:', userId);
+
+    return this.userModel.findById(userId);
   }
 }
