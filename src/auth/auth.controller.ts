@@ -7,13 +7,14 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './auth.schema';
 import { SignupDto } from './DTO/singup.dto';
 import { LoginDto } from './DTO/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -58,24 +59,16 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('user')
   async getProfile(@Req() req: Request) {
-    console.log('User:', req['user']);
-    const userId = req['user'].id;
-    return this.authService.getProfile(userId);
+    return this.authService.getProfile(req['user'].id);
   }
 
   @Get('admin/profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async getProfiles(@Req() req: Request) {
-    let userId;
-    const { id, role } = req['user'];
-    role === 'admin'
-      ? (userId = id)
-      : (() => {
-          throw new UnauthorizedException('Not an admin');
-        })();
-
-    return this.authService.getProfile(userId);
+    return this.authService.getProfile(req['user'].id);
   }
 }
