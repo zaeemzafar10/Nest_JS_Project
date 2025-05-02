@@ -80,4 +80,8 @@ export class AuthService {
 
     return this.userModel.findById(userId);
   }
+
+  async getAllUsers(userId: string | null): Promise<User[] | null> {
+    return this.userModel.find({ role: 'user' });
+  }
 }

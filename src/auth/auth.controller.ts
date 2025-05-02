@@ -71,4 +71,11 @@ export class AuthController {
   async getProfiles(@Req() req: Request) {
     return this.authService.getProfile(req['user'].id);
   }
+
+  @Get('allusers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'user')
+  async getAllUsers(@Req() req: Request) {
+    return this.authService.getAllUsers(req['user'].id);
+  }
 }
