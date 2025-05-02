@@ -27,13 +27,13 @@ export class AuthController {
   }
 
   @Post('login')
-  // @UsePipes(
-  //     new ValidationPipe({
-  //       whitelist: true, // fields are required but not in payload
-  //       forbidNonWhitelisted: true, // fields are not in schema and dto
-  //       transform: true,
-  //     }),
-  //     ),
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
   async loginUser(
     @Body() user: LoginDto,
   ): Promise<{ message: string; data: { user: User; token: string } }> {
